@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
-
+console.log('SUPABASE_URL is:', JSON.stringify(process.env.SUPABASE_URL));
   try {
     const { guestName, email, hotelName, checkIn, checkOut, guests, amount } = req.body;
 
