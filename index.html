@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kartha Hotels — Heritage Stays, Reimagined</title>
+<meta name="description" content="Kartha Hotels: heritage-inspired luxury stays across India and beyond. Book direct, no middlemen.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#12211F;
+    --ivory:#F6F1E4;
+    --teal:#0F2A2E;
+    --brass:#B8863C;
+    --maroon:#7A2E2E;
+    --line: rgba(246,241,228,0.18);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Work Sans', sans-serif;
+    background:var(--ivory);
+    color:var(--ink);
+    line-height:1.5;
+  }
+  h1,h2,h3, .display{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    letter-spacing:-0.01em;
+  }
+  a{color:inherit; text-decoration:none;}
+  img{max-width:100%; display:block;}
+
+  /* ===== Header ===== */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:var(--teal);
+    color:var(--ivory);
+    border-bottom:1px solid var(--line);
+  }
+  .header-inner{
+    max-width:1160px; margin:0 auto; padding:18px 24px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .brand{
+    font-family:'Fraunces', serif; font-size:1.4rem; font-weight:600;
+    display:flex; align-items:baseline; gap:8px;
+  }
+  .brand .mark{
+    width:10px; height:10px; border-radius:50%;
+    background:var(--brass); display:inline-block; transform:translateY(-2px);
+  }
+  nav{display:flex; gap:28px; font-size:0.92rem;}
+  nav a{opacity:0.85; transition:opacity 0.2s;}
+  nav a:hover{opacity:1;}
+  .cart-pill{
+    border:1px solid var(--line); border-radius:999px; padding:6px 14px;
+    font-size:0.85rem; display:flex; align-items:center; gap:8px;
+    cursor:pointer; background:transparent; color:var(--ivory);
+  }
+  .cart-pill .count{
+    background:var(--brass); color:var(--teal); border-radius:50%;
+    width:18px; height:18px; display:inline-flex; align-items:center; justify-content:center;
+    font-size:0.72rem; font-weight:600;
+  }
+
+  /* ===== Hero ===== */
+  .hero{
+    background:var(--teal); color:var(--ivory);
+    padding:64px 24px 0;
+  }
+  .hero-inner{
+    max-width:1160px; margin:0 auto;
+    display:grid; grid-template-columns:1.15fr 0.85fr; gap:48px;
+    align-items:end;
+  }
+  .hero-eyebrow{
+    font-size:0.85rem; color:var(--brass); margin-bottom:14px;
+  }
+  .hero h1{
+    font-size:clamp(2.2rem, 4.6vw, 3.6rem);
+    line-height:1.08;
+    max-width:14ch;
+  }
+  .hero p.lede{
+    margin-top:20px; max-width:42ch; opacity:0.82; font-size:1.05rem;
+  }
+
+  /* the "arrival card" — boarding-pass style ticket motif */
+  .arrival-card{
+    background:var(--ivory); color:var(--ink);
+    border-radius:6px;
+    padding:22px 22px 0;
+    position:relative;
+    box-shadow:0 30px 60px -20px rgba(0,0,0,0.45);
+  }
+  .arrival-card::after{
+    content:"";
+    display:block;
+    height:14px;
+    background-image: radial-gradient(circle at 8px 7px, transparent 7px, var(--ivory) 7.5px);
+    background-size: 16px 14px;
+    background-repeat: repeat-x;
+    transform: translateY(1px);
+  }
+  .arrival-row{
+    display:flex; justify-content:space-between; font-size:0.75rem;
+    text-transform:uppercase; letter-spacing:0.04em; opacity:0.55; margin-bottom:6px;
+  }
+  .arrival-main{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    padding-bottom:18px; border-bottom:1px dashed rgba(18,33,31,0.2); margin-bottom:14px;
+  }
+  .arrival-main .city{ font-family:'Fraunces', serif; font-size:1.6rem; }
+  .arrival-main .arrow{ opacity:0.4; font-size:1.2rem; padding:0 4px;}
+  .arrival-meta{ display:flex; gap:22px; padding-bottom:20px; }
+  .arrival-meta div{ font-size:0.9rem; }
+  .arrival-meta span{ display:block; font-size:0.7rem; text-transform:uppercase; opacity:0.5; margin-bottom:3px;}
+
+  /* ===== Search bar ===== */
+  .search-panel{
+    max-width:1160px; margin:36px auto 0; padding:0 24px;
+    transform:translateY(28px);
+  }
+  .search-box{
+    background:var(--ivory); border:1px solid rgba(18,33,31,0.1);
+    border-radius:8px; box-shadow:0 20px 40px -24px rgba(0,0,0,0.35);
+    display:grid; grid-template-columns:1.3fr 1fr 1fr 0.8fr auto; gap:0;
+    overflow:hidden;
+  }
+  .search-field{
+    padding:14px 18px; border-right:1px solid rgba(18,33,31,0.08);
+  }
+  .search-field label{
+    display:block; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.04em;
+    opacity:0.55; margin-bottom:4px;
+  }
+  .search-field input, .search-field select{
+    border:none; background:none; font-family:inherit; font-size:0.95rem;
+    width:100%; color:var(--ink);
+  }
+  .search-field input:focus, .search-field select:focus{ outline:none; }
+  .search-submit{
+    background:var(--maroon); color:var(--ivory); border:none;
+    font-family:'Work Sans', sans-serif; font-weight:600; font-size:0.95rem;
+    padding:0 30px; cursor:pointer; transition:background 0.2s;
+  }
+  .search-submit:hover{ background:#5f2222; }
+
+  /* ===== Sections ===== */
+  section{ padding:96px 24px 0; }
+  .section-inner{ max-width:1160px; margin:0 auto; }
+  .section-head{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    margin-bottom:36px; gap:24px; flex-wrap:wrap;
+  }
+  .section-head h2{ font-size:1.9rem; }
+  .section-head p{ max-width:38ch; opacity:0.7; font-size:0.95rem; }
+
+  .brand-strip{
+    display:flex; gap:28px; flex-wrap:wrap; margin-top:16px;
+    font-size:0.85rem; opacity:0.6;
+  }
+  .brand-strip button{
+    background:none; border:none; font-family:inherit; font-size:inherit;
+    cursor:pointer; padding:6px 0; border-bottom:2px solid transparent; color:var(--ink); opacity:0.6;
+  }
+  .brand-strip button.active{ opacity:1; border-bottom-color:var(--brass); font-weight:600; }
+
+  .hotel-grid{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:28px; margin-top:36px;
+  }
+  .hotel-card{
+    background:#fff; border:1px solid rgba(18,33,31,0.08);
+  }
+  .hotel-photo{
+    height:170px; background:linear-gradient(135deg, var(--teal), #1c4a45);
+    position:relative; display:flex; align-items:flex-end; padding:14px;
+  }
+  .hotel-photo .tag{
+    background:rgba(246,241,228,0.92); color:var(--teal); font-size:0.7rem;
+    padding:4px 10px; border-radius:999px; text-transform:uppercase; letter-spacing:0.03em;
+  }
+  .hotel-body{ padding:18px 18px 20px; }
+  .hotel-body .loc{ font-size:0.78rem; opacity:0.55; margin-bottom:4px; }
+  .hotel-body h3{ font-size:1.15rem; margin-bottom:8px; }
+  .hotel-body .desc{ font-size:0.88rem; opacity:0.72; margin-bottom:16px; min-height:38px;}
+  .hotel-foot{ display:flex; justify-content:space-between; align-items:center; }
+  .hotel-price{ font-family:'Fraunces', serif; font-size:1.1rem; }
+  .hotel-price small{ font-family:'Work Sans'; font-size:0.75rem; opacity:0.55; font-weight:400;}
+  .btn-select{
+    background:var(--teal); color:var(--ivory); border:none; padding:9px 16px;
+    font-size:0.85rem; font-weight:500; cursor:pointer; border-radius:4px;
+  }
+  .btn-select:hover{ background:var(--maroon); }
+
+  /* ===== Cart drawer ===== */
+  .drawer{
+    position:fixed; top:0; right:0; height:100%; width:380px; max-width:92vw;
+    background:var(--teal); color:var(--ivory); z-index:100;
+    transform:translateX(100%); transition:transform 0.32s ease;
+    display:flex; flex-direction:column; box-shadow:-30px 0 60px rgba(0,0,0,0.3);
+  }
+  .drawer.open{ transform:translateX(0); }
+  .drawer-head{ padding:24px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center;}
+  .drawer-head button{ background:none; border:none; color:var(--ivory); font-size:1.2rem; cursor:pointer; }
+  .drawer-body{ padding:20px 24px; flex:1; overflow-y:auto; }
+  .drawer-item{ padding:14px 0; border-bottom:1px solid var(--line); font-size:0.9rem; }
+  .drawer-item .row{ display:flex; justify-content:space-between; margin-bottom:4px;}
+  .drawer-item .muted{ opacity:0.6; font-size:0.8rem; }
+  .empty-cart{ opacity:0.6; font-size:0.9rem; padding:30px 0; text-align:center; }
+  .drawer-foot{ padding:20px 24px; border-top:1px solid var(--line); }
+  .drawer-foot .total-row{ display:flex; justify-content:space-between; font-family:'Fraunces', serif; font-size:1.2rem; margin-bottom:14px;}
+  .btn-checkout{
+    width:100%; background:var(--brass); color:var(--teal); border:none;
+    padding:13px; font-weight:600; font-size:0.95rem; cursor:pointer; border-radius:4px;
+  }
+  .btn-checkout:disabled{ opacity:0.5; cursor:not-allowed; }
+  .scrim{
+    position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:90; opacity:0; pointer-events:none;
+    transition:opacity 0.3s;
+  }
+  .scrim.show{ opacity:1; pointer-events:auto; }
+
+  /* ===== Checkout form ===== */
+  .checkout-form{ display:flex; flex-direction:column; gap:12px; margin-top:6px;}
+  .checkout-form input{
+    background:rgba(246,241,228,0.08); border:1px solid var(--line); color:var(--ivory);
+    padding:10px 12px; font-family:inherit; font-size:0.9rem; border-radius:4px;
+  }
+  .checkout-form input::placeholder{ color:rgba(246,241,228,0.5); }
+  .form-note{ font-size:0.78rem; opacity:0.55; margin-top:6px; }
+  .confirm-box{
+    background:rgba(184,134,60,0.14); border:1px solid var(--brass); border-radius:4px;
+    padding:14px; font-size:0.85rem; margin-top:14px; display:none;
+  }
+  .confirm-box.show{ display:block; }
+
+  /* ===== Footer ===== */
+  footer{
+    margin-top:110px; background:var(--teal); color:rgba(246,241,228,0.7);
+    padding:48px 24px 28px;
+  }
+  .footer-inner{ max-width:1160px; margin:0 auto; display:flex; justify-content:space-between; flex-wrap:wrap; gap:20px;}
+  .footer-links{ display:flex; gap:24px; font-size:0.85rem; }
+  .footer-bottom{
+    max-width:1160px; margin:32px auto 0; padding-top:20px; border-top:1px solid var(--line);
+    font-size:0.78rem; opacity:0.6;
+  }
+
+  @media (max-width: 900px){
+    .hero-inner{ grid-template-columns:1fr; }
+    .search-box{ grid-template-columns:1fr; }
+    .search-field{ border-right:none; border-bottom:1px solid rgba(18,33,31,0.08); }
+    .hotel-grid{ grid-template-columns:1fr; }
+    .search-panel{ transform:translateY(0); margin-top:20px;}
+    section{ padding-top:64px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand"><span class="mark"></span>Kartha</div>
+    <nav>
+      <a href="#stays">Stays</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <button class="cart-pill" id="cartToggle">
+      My Stay <span class="count" id="cartCount">0</span>
+    </button>
+  </div>
+</header>
+
+<section class="hero" style="padding-top:56px;">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow">Heritage properties, booked direct</div>
+      <h1>A room with the weight of a place's history</h1>
+      <p class="lede">Kartha runs a small collection of restored havelis, hill retreats and coastal courtyards across India — no franchise sameness, no booking-fee markup.</p>
+    </div>
+    <div class="arrival-card">
+      <div class="arrival-row"><span>Itinerary</span><span>KRT-0417</span></div>
+      <div class="arrival-main">
+        <span class="city">Udaipur</span>
+        <span class="arrow">⟶</span>
+        <span class="city">Kumbalgarh</span>
+      </div>
+      <div class="arrival-meta">
+        <div><span>Check-in</span>Fri, Oct 09</div>
+        <div><span>Nights</span>3</div>
+        <div><span>Guests</span>2</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="search-panel">
+    <form class="search-box" id="searchForm">
+      <div class="search-field">
+        <label for="destination">Destination</label>
+        <input id="destination" name="destination" placeholder="Where to?" />
+      </div>
+      <div class="search-field">
+        <label for="checkin">Check-in</label>
+        <input id="checkin" name="checkin" type="date" />
+      </div>
+      <div class="search-field">
+        <label for="checkout">Check-out</label>
+        <input id="checkout" name="checkout" type="date" />
+      </div>
+      <div class="search-field">
+        <label for="guests">Guests</label>
+        <select id="guests" name="guests">
+          <option>1 Guest</option>
+          <option selected>2 Guests</option>
+          <option>3 Guests</option>
+          <option>4 Guests</option>
+        </select>
+      </div>
+      <button class="search-submit" type="submit">Search</button>
+    </form>
+  </div>
+</section>
+
+<section id="stays" style="padding-top:150px;">
+  <div class="section-inner">
+    <div class="section-head">
+      <div>
+        <h2>Featured properties</h2>
+        <p>Six houses, each kept by the family that has run it for generations.</p>
+      </div>
+    </div>
+    <div class="brand-strip" id="brandStrip"></div>
+    <div class="hotel-grid" id="hotelGrid"></div>
+  </div>
+</section>
+
+<section id="about" style="padding-top:96px;">
+  <div class="section-inner" style="max-width:640px;">
+    <h2>Why Kartha</h2>
+    <p style="margin-top:16px; opacity:0.75; font-size:1rem;">
+      Most booking sites make every property look the same size and shape. Kartha lists fewer hotels,
+      each one visited and vetted by our own team, and passes the savings from cutting out third-party
+      commissions straight into the room rate.
+    </p>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="footer-inner">
+    <div class="brand" style="color:var(--ivory);"><span class="mark"></span>Kartha</div>
+    <div class="footer-links">
+      <a href="#">About</a>
+      <a href="#">Destinations</a>
+      <a href="#">Privacy</a>
+      <a href="#">Contact</a>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 Kartha Hotels. All rights reserved.</div>
+</footer>
+
+<div class="scrim" id="scrim"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <h3 style="font-size:1.1rem;">My stay</h3>
+    <button id="drawerClose">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div id="drawerItems"><div class="empty-cart">No room selected yet. Browse stays to begin.</div></div>
+
+    <form class="checkout-form" id="checkoutForm" style="display:none;">
+      <input type="text" id="guestName" placeholder="Full name" required>
+      <input type="email" id="guestEmail" placeholder="Email" required>
+      <div class="confirm-box" id="confirmBox"></div>
+    </form>
+  </div>
+  <div class="drawer-foot">
+    <div class="total-row"><span>Total</span><span id="cartTotal">$0</span></div>
+    <button class="btn-checkout" id="checkoutBtn" disabled>Select a room first</button>
+  </div>
+</div>
+
+<script>
+const HOTELS = [
+  { id:1, brand:"Aravalli House", city:"Udaipur, Rajasthan", desc:"A 1920s lakeside haveli, seven rooms.", price:210 },
+  { id:2, brand:"Kumbal Fort Lodge", city:"Kumbalgarh, Rajasthan", desc:"Stone ramparts, wood fires, no wifi in the courtyard.", price:265 },
+  { id:3, brand:"Backwater Nilaya", city:"Alleppey, Kerala", desc:"A converted rice-boat, moored for the season.", price:180 },
+  { id:4, brand:"Nandi Hill Retreat", city:"Chikkaballapur, Karnataka", desc:"Coffee-estate bungalow, sunrise treks included.", price:145 },
+  { id:5, brand:"Kotagiri Bungalow", city:"Nilgiris, Tamil Nadu", desc:"Colonial-era tea planter's house at 6,000 ft.", price:160 },
+  { id:6, brand:"Diu Courtyard", city:"Diu", desc:"Portuguese-era courtyard house, three suites, sea view.", price:120 },
+];
+
+const grid = document.getElementById('hotelGrid');
+grid.innerHTML = HOTELS.map(h => `
+  <div class="hotel-card">
+    <div class="hotel-photo"><span class="tag">${h.brand}</span></div>
+    <div class="hotel-body">
+      <div class="loc">${h.city}</div>
+      <h3>${h.brand}</h3>
+      <div class="desc">${h.desc}</div>
+      <div class="hotel-foot">
+        <div class="hotel-price">$${h.price}<small> / night</small></div>
+        <button class="btn-select" data-id="${h.id}">Select</button>
+      </div>
+    </div>
+  </div>
+`).join('');
+
+let cart = null; // single room at a time for simplicity
+
+const drawer = document.getElementById('drawer');
+const scrim = document.getElementById('scrim');
+const drawerItems = document.getElementById('drawerItems');
+const cartCount = document.getElementById('cartCount');
+const cartTotal = document.getElementById('cartTotal');
+const checkoutBtn = document.getElementById('checkoutBtn');
+const checkoutForm = document.getElementById('checkoutForm');
+const confirmBox = document.getElementById('confirmBox');
+
+function openDrawer(){ drawer.classList.add('open'); scrim.classList.add('show'); }
+function closeDrawer(){ drawer.classList.remove('open'); scrim.classList.remove('show'); }
+
+document.getElementById('cartToggle').onclick = openDrawer;
+document.getElementById('drawerClose').onclick = closeDrawer;
+scrim.onclick = closeDrawer;
+
+grid.addEventListener('click', (e) => {
+  const btn = e.target.closest('.btn-select');
+  if(!btn) return;
+  const hotel = HOTELS.find(h => h.id == btn.dataset.id);
+  const nights = 3;
+  cart = { ...hotel, nights, amount: hotel.price * nights };
+  renderCart();
+  openDrawer();
+});
+
+function renderCart(){
+  if(!cart){
+    drawerItems.innerHTML = '<div class="empty-cart">No room selected yet. Browse stays to begin.</div>';
+    checkoutForm.style.display = 'none';
+    cartCount.textContent = '0';
+    cartTotal.textContent = '$0';
+    checkoutBtn.disabled = true;
+    checkoutBtn.textContent = 'Select a room first';
+    return;
+  }
+  drawerItems.innerHTML = `
+    <div class="drawer-item">
+      <div class="row"><strong>${cart.brand}</strong><span>$${cart.amount}</span></div>
+      <div class="muted">${cart.city} · ${cart.nights} nights</div>
+    </div>
+  `;
+  checkoutForm.style.display = 'flex';
+  cartCount.textContent = '1';
+  cartTotal.textContent = '$' + cart.amount;
+  checkoutBtn.disabled = false;
+  checkoutBtn.textContent = 'Confirm booking';
+}
+
+checkoutBtn.addEventListener('click', async () => {
+  if(!cart) return;
+  const name = document.getElementById('guestName').value.trim();
+  const email = document.getElementById('guestEmail').value.trim();
+  if(!name || !email){
+    checkoutForm.reportValidity();
+    return;
+  }
+  checkoutBtn.disabled = true;
+  checkoutBtn.textContent = 'Booking…';
+
+  const today = new Date();
+  const checkIn = today.toISOString().slice(0,10);
+  const checkOutDate = new Date(today.getTime() + cart.nights*86400000);
+  const checkOut = checkOutDate.toISOString().slice(0,10);
+
+  try{
+    const res = await fetch('/api/book', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({
+        guestName: name,
+        email: email,
+        hotelName: cart.brand,
+        checkIn, checkOut,
+        guests: 2,
+        amount: cart.amount
+      })
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || 'Booking failed');
+
+    confirmBox.classList.add('show');
+    confirmBox.textContent = `Booked. Confirmation ref ${data.booking?.id ?? ''}. A copy was sent to ${email}.`;
+    checkoutBtn.textContent = 'Booking confirmed';
+  } catch(err){
+    confirmBox.classList.add('show');
+    confirmBox.style.borderColor = '#c0392b';
+    confirmBox.textContent = 'Something went wrong saving your booking: ' + err.message;
+    checkoutBtn.disabled = false;
+    checkoutBtn.textContent = 'Confirm booking';
+  }
+});
+
+document.getElementById('searchForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  document.getElementById('stays').scrollIntoView({behavior:'smooth'});
+});
+</script>
+
+</body>
+</html>
