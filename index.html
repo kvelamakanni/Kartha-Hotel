@@ -401,10 +401,13 @@
     <form class="checkout-form" id="checkoutForm" style="display:none;">
       <input type="text" id="guestName" placeholder="Full name" required>
       <input type="email" id="guestEmail" placeholder="Email" required>
+      <input type="text" id="promoCode" placeholder="Promo code (optional)">
+      <div class="form-note" id="discountNote"></div>
       <div class="confirm-box" id="confirmBox"></div>
     </form>
   </div>
   <div class="drawer-foot">
+    <div class="total-row" id="discountRow" style="display:none; font-size:0.85rem; opacity:0.75; font-family:'Work Sans', sans-serif;"><span>Discount</span><span id="cartDiscount">-$0</span></div>
     <div class="total-row"><span>Total</span><span id="cartTotal">$0</span></div>
     <button class="btn-checkout" id="checkoutBtn" disabled>Select a room first</button>
   </div>
@@ -594,11 +597,20 @@ renderGrid();
 
 let cart = null; // single room at a time for simplicity
 
+// Mirrors lib/discounts.js — the dev.ucp.shopping.discount capability's
+// promo-code table. Client-side copy is just for a live preview; the
+// server (api/book.js) is the source of truth for the charged amount.
+const PROMO_CODES = { WELCOME10: 0.10, STAY20: 0.20 };
+
 const drawer = document.getElementById('drawer');
 const scrim = document.getElementById('scrim');
 const drawerItems = document.getElementById('drawerItems');
 const cartCount = document.getElementById('cartCount');
 const cartTotal = document.getElementById('cartTotal');
+const cartDiscount = document.getElementById('cartDiscount');
+const discountRow = document.getElementById('discountRow');
+const discountNote = document.getElementById('discountNote');
+const promoCodeInput = document.getElementById('promoCode');
 const checkoutBtn = document.getElementById('checkoutBtn');
 const checkoutForm = document.getElementById('checkoutForm');
 const confirmBox = document.getElementById('confirmBox');
@@ -628,12 +640,18 @@ grid.addEventListener('click', (e) => {
   }
 });
 
+function currentPromo(){
+  const code = (promoCodeInput?.value || '').trim().toUpperCase();
+  return code && PROMO_CODES[code] ? { code, pct: PROMO_CODES[code] } : null;
+}
+
 function renderCart(){
   confirmBox.classList.remove('show');
   confirmBox.style.borderColor = '';
   if(!cart){
     drawerItems.innerHTML = '<div class="empty-cart">No room selected yet. Browse stays to begin.</div>';
     checkoutForm.style.display = 'none';
+    discountRow.style.display = 'none';
     cartCount.textContent = '0';
     cartTotal.textContent = '$0';
     checkoutBtn.disabled = true;
@@ -648,10 +666,29 @@ function renderCart(){
   `;
   checkoutForm.style.display = 'flex';
   cartCount.textContent = '1';
-  cartTotal.textContent = '$' + cart.amount;
+  updateTotals();
   checkoutBtn.disabled = false;
   checkoutBtn.textContent = 'Confirm booking';
 }
+
+function updateTotals(){
+  if(!cart) return;
+  const promo = currentPromo();
+  const raw = (promoCodeInput?.value || '').trim();
+  if(!promo){
+    discountRow.style.display = 'none';
+    cartTotal.textContent = '$' + cart.amount;
+    discountNote.textContent = raw ? `"${raw}" isn't a valid code.` : '';
+    return;
+  }
+  const discount = Math.round(cart.amount * promo.pct * 100) / 100;
+  discountRow.style.display = 'flex';
+  cartDiscount.textContent = '-$' + discount;
+  cartTotal.textContent = '$' + (cart.amount - discount);
+  discountNote.textContent = `${promo.code} applied (${promo.pct * 100}% off).`;
+}
+
+promoCodeInput.addEventListener('input', updateTotals);
 
 checkoutBtn.addEventListener('click', async () => {
   if(!cart) return;
@@ -669,6 +706,8 @@ checkoutBtn.addEventListener('click', async () => {
   const checkOutDate = new Date(today.getTime() + cart.nights*86400000);
   const checkOut = checkOutDate.toISOString().slice(0,10);
 
+  const promoCode = promoCodeInput.value.trim() || undefined;
+
   try{
     const res = await fetch('/api/book', {
       method:'POST',
@@ -679,7 +718,8 @@ checkoutBtn.addEventListener('click', async () => {
         hotelId: cart.hotel.id,
         roomId: cart.room.id,
         checkIn, checkOut,
-        guests: cart.room.max_guests
+        guests: cart.room.max_guests,
+        promoCode
       })
     });
     const data = await res.json();

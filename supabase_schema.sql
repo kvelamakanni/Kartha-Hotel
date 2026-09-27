@@ -19,6 +19,9 @@ create table if not exists bookings (
   guests int default 1,
   nights int,
   unit_price numeric,
+  subtotal numeric,
+  promo_code text,
+  discount_amount numeric default 0,
   amount numeric default 0,
   created_at timestamptz default now()
 );
@@ -31,6 +34,9 @@ alter table bookings add column if not exists room_id text;
 alter table bookings add column if not exists room_name text;
 alter table bookings add column if not exists nights int;
 alter table bookings add column if not exists unit_price numeric;
+alter table bookings add column if not exists subtotal numeric;
+alter table bookings add column if not exists promo_code text;
+alter table bookings add column if not exists discount_amount numeric default 0;
 
 create unique index if not exists bookings_booking_ref_key on bookings(booking_ref);
 

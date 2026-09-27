@@ -1,6 +1,7 @@
 import { supabase } from '../../../lib/supabaseClient.js';
 import { findHotel, findRoom, nightsBetween } from '../../../lib/hotels.js';
 import { toUcpSession } from '../../../lib/sessions.js';
+import { applyDiscount } from '../../../lib/discounts.js';
 
 function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -16,7 +17,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { hotel_id, room_id, check_in, check_out, guests } = req.body || {};
+    const { hotel_id, room_id, check_in, check_out, guests, promo_code } = req.body || {};
     const hotel = findHotel(hotel_id);
 
     if (!hotel) {
@@ -34,7 +35,14 @@ export default async function handler(req, res) {
 
     const nights = nightsBetween(check_in, check_out);
     const guestCount = guests || 1;
-    const amount = room.price_per_night * nights;
+    const subtotal = room.price_per_night * nights;
+
+    let normalizedPromo, discount_amount, total;
+    try {
+      ({ promo_code: normalizedPromo, discount_amount, total } = applyDiscount(subtotal, promo_code));
+    } catch (err) {
+      return res.status(400).json({ error: { message: err.message } });
+    }
 
     const { data, error } = await supabase
       .from('checkout_sessions')
@@ -50,7 +58,10 @@ export default async function handler(req, res) {
         guests: guestCount,
         nights,
         unit_price: room.price_per_night,
-        amount,
+        subtotal,
+        promo_code: normalizedPromo,
+        discount_amount,
+        amount: total,
       }])
       .select()
       .single();

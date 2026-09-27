@@ -132,12 +132,30 @@ curl -s -X POST "$SITE/api/ucp/checkout-sessions/$ID/complete"
   `create_booking_session`, `submit_buyer_info` (this server's own addition —
   see note below), `complete_booking`, `cancel_booking`.
 
+`search_hotels` filters out any hotel with no room that fits the requested
+`guests`, and reports `from_price_per_night` as the cheapest *qualifying*
+room — not just the overall cheapest room.
+
+`create_booking_session` (MCP) and `POST /api/ucp/checkout-sessions` (REST)
+take an optional `promo_code` (`dev.ucp.shopping.discount` capability).
+Known codes: `WELCOME10` (10% off), `STAY20` (20% off) — see
+`lib/discounts.js`.
+
+`complete_booking` (MCP) and `POST .../complete` (REST) take an optional
+`payment_token` (`dev.ucp.mock_payment` handler, declared in
+`/.well-known/ucp`'s `payment_handlers`): `"success_token"` succeeds,
+`"fail_token"` is rejected with a mock decline, and omitting it entirely
+skips the payment step (no real charge is ever made either way) — see
+`lib/payments.js`.
+
 > **Note:** the reference UCP hotel site this was matched against resolves
 > buyer identity via OAuth2 identity-linking (see its `auth` block in
 > `/.well-known/ucp`), so its `complete_booking` needs no separate buyer step.
 > This project doesn't implement OAuth yet, so `submit_buyer_info` (name +
 > email) is a required extra step between `create_booking_session` and
-> `complete_booking`.
+> `complete_booking`. Real OAuth2 + JWKS request signing is intentionally
+> not faked here — it's a bigger, separate build, not something worth
+> stubbing out just to match the discovery doc's shape.
 
 Quick test:
 ```bash

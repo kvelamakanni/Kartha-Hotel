@@ -35,8 +35,35 @@ export default function handler(req, res) {
             schema: "https://ucp.dev/schemas/shopping/checkout.json",
           },
         ],
+        "dev.ucp.shopping.payment": [
+          {
+            version: UCP_VERSION,
+            spec: "https://ucp.dev/specs/shopping/payment",
+            schema: "https://ucp.dev/schemas/shopping/payment.json",
+          },
+        ],
+        "dev.ucp.shopping.discount": [
+          {
+            version: UCP_VERSION,
+            spec: "https://ucp.dev/specs/shopping/discount",
+            schema: "https://ucp.dev/schemas/shopping/discount.json",
+            extends: "dev.ucp.shopping.checkout",
+          },
+        ],
       },
-      payment_handlers: {},
+      payment_handlers: {
+        "dev.ucp.mock_payment": [
+          {
+            id: "dev.ucp.mock_payment",
+            version: UCP_VERSION,
+            spec: "https://ucp.dev/specs/mock",
+            schema: "https://ucp.dev/schemas/mock.json",
+            config_schema: "https://ucp.dev/schemas/mock.json",
+            instrument_schemas: ["https://ucp.dev/schemas/shopping/types/card_payment_instrument.json"],
+            config: { supported_tokens: ["success_token", "fail_token"] },
+          },
+        ],
+      },
     },
     keys: [],
   });

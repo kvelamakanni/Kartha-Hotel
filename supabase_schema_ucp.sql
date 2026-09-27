@@ -15,6 +15,9 @@ create table if not exists checkout_sessions (
   guests int default 1,
   nights int not null,
   unit_price numeric not null,
+  subtotal numeric,
+  promo_code text,
+  discount_amount numeric default 0,
   amount numeric not null,
   guest_name text,
   email text,
@@ -27,6 +30,9 @@ alter table checkout_sessions add column if not exists hotel_id text;
 alter table checkout_sessions add column if not exists brand text;
 alter table checkout_sessions add column if not exists room_id text;
 alter table checkout_sessions add column if not exists room_name text;
+alter table checkout_sessions add column if not exists subtotal numeric;
+alter table checkout_sessions add column if not exists promo_code text;
+alter table checkout_sessions add column if not exists discount_amount numeric default 0;
 
 alter table checkout_sessions enable row level security;
 -- Same pattern as `bookings`: no public policies. Only the Vercel functions,

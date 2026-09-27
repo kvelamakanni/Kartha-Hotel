@@ -1,6 +1,8 @@
 import { supabase } from '../lib/supabaseClient.js';
 import { findHotel, findRoom, searchHotels, nightsBetween } from '../lib/hotels.js';
 import { toUcpSession, generateBookingRef } from '../lib/sessions.js';
+import { applyDiscount } from '../lib/discounts.js';
+import { validatePaymentToken } from '../lib/payments.js';
 
 const TOOLS = [
   {
@@ -37,6 +39,7 @@ const TOOLS = [
         check_in: { type: 'string', description: 'Check-in date YYYY-MM-DD' },
         check_out: { type: 'string', description: 'Check-out date YYYY-MM-DD' },
         guests: { type: 'integer', description: 'Number of guests' },
+        promo_code: { type: 'string', description: 'Optional discount code (dev.ucp.shopping.discount capability)' },
       },
       required: ['hotel_id', 'room_id', 'check_in', 'check_out'],
     },
@@ -59,7 +62,10 @@ const TOOLS = [
     description: 'Complete a hotel booking session and generate a booking confirmation.',
     inputSchema: {
       type: 'object',
-      properties: { session_id: { type: 'string', description: 'The checkout session ID to complete' } },
+      properties: {
+        session_id: { type: 'string', description: 'The checkout session ID to complete' },
+        payment_token: { type: 'string', description: 'Optional dev.ucp.mock_payment token: "success_token" or "fail_token". Omit to skip the payment step.' },
+      },
       required: ['session_id'],
     },
   },
@@ -81,8 +87,17 @@ function truncate(text, max) {
   return text.slice(0, max).trimEnd() + '...';
 }
 
-function toSearchSummary(hotel) {
-  const cheapest = hotel.room_types.reduce((min, r) => Math.min(min, r.price_per_night), Infinity);
+// Returns null if `guests` is set and no room at this hotel can fit that
+// many people — matching devara-hotel-site's search_hotels behavior, which
+// drops hotels with no qualifying room and computes "from" price only over
+// rooms that actually fit the party.
+function toSearchSummary(hotel, guests) {
+  const qualifying = guests
+    ? hotel.room_types.filter((r) => r.max_guests >= guests)
+    : hotel.room_types;
+  if (guests && qualifying.length === 0) return null;
+
+  const cheapest = qualifying.reduce((min, r) => Math.min(min, r.price_per_night), Infinity);
   return {
     id: hotel.id,
     brand: hotel.brand,
@@ -100,7 +115,9 @@ function toSearchSummary(hotel) {
 async function callTool(name, args) {
   switch (name) {
     case 'search_hotels': {
-      const results = searchHotels(args?.destination).map(toSearchSummary);
+      const results = searchHotels(args?.destination)
+        .map((h) => toSearchSummary(h, args?.guests))
+        .filter(Boolean);
       return { hotels: results, count: results.length };
     }
 
@@ -117,7 +134,8 @@ async function callTool(name, args) {
       if (!room) throw new Error(`No room matching "${args?.room_id}" at ${hotel.name}`);
 
       const nights = nightsBetween(args.check_in, args.check_out);
-      const amount = room.price_per_night * nights;
+      const subtotal = room.price_per_night * nights;
+      const { promo_code, discount_amount, total } = applyDiscount(subtotal, args?.promo_code);
 
       const { data, error } = await supabase
         .from('checkout_sessions')
@@ -133,7 +151,10 @@ async function callTool(name, args) {
           guests: args.guests || 1,
           nights,
           unit_price: room.price_per_night,
-          amount,
+          subtotal,
+          promo_code,
+          discount_amount,
+          amount: total,
         }])
         .select()
         .single();
@@ -176,6 +197,7 @@ async function callTool(name, args) {
       if (session.status !== 'ready_for_complete') {
         throw new Error(`Session must be ready_for_complete (currently ${session.status}). Call submit_buyer_info first.`);
       }
+      validatePaymentToken(args?.payment_token);
 
       const { data: booking, error: bookingErr } = await supabase
         .from('bookings')
@@ -193,6 +215,9 @@ async function callTool(name, args) {
           guests: session.guests,
           nights: session.nights,
           unit_price: session.unit_price,
+          subtotal: session.subtotal,
+          promo_code: session.promo_code,
+          discount_amount: session.discount_amount,
           amount: session.amount,
         }])
         .select()

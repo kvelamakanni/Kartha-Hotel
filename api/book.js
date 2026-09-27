@@ -1,6 +1,8 @@
 import { supabase } from '../lib/supabaseClient.js';
 import { findHotel, findRoom, nightsBetween } from '../lib/hotels.js';
 import { generateBookingRef } from '../lib/sessions.js';
+import { applyDiscount } from '../lib/discounts.js';
+import { validatePaymentToken } from '../lib/payments.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -8,7 +10,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { guestName, email, hotelId, roomId, checkIn, checkOut, guests } = req.body || {};
+    const { guestName, email, hotelId, roomId, checkIn, checkOut, guests, promoCode, paymentToken } = req.body || {};
 
     if (!guestName || !email || !hotelId || !roomId || !checkIn || !checkOut) {
       return res.status(400).json({ error: 'Missing required fields' });
@@ -20,7 +22,15 @@ export default async function handler(req, res) {
     if (!room) return res.status(400).json({ error: `No room matching "${roomId}" at ${hotel.name}` });
 
     const nights = nightsBetween(checkIn, checkOut);
-    const amount = room.price_per_night * nights;
+    const subtotal = room.price_per_night * nights;
+
+    let promo_code, discount_amount, amount;
+    try {
+      ({ promo_code, discount_amount, total: amount } = applyDiscount(subtotal, promoCode));
+      validatePaymentToken(paymentToken);
+    } catch (err) {
+      return res.status(400).json({ error: err.message });
+    }
 
     const { data, error } = await supabase
       .from('bookings')
@@ -38,6 +48,9 @@ export default async function handler(req, res) {
         guests: guests || 1,
         nights,
         unit_price: room.price_per_night,
+        subtotal,
+        promo_code,
+        discount_amount,
         amount,
       }])
       .select();

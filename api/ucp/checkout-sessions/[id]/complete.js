@@ -1,5 +1,6 @@
 import { supabase } from '../../../../lib/supabaseClient.js';
 import { toUcpSession, generateBookingRef } from '../../../../lib/sessions.js';
+import { validatePaymentToken } from '../../../../lib/payments.js';
 
 function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -32,6 +33,12 @@ export default async function handler(req, res) {
       });
     }
 
+    try {
+      validatePaymentToken((req.body || {}).payment_token);
+    } catch (err) {
+      return res.status(402).json({ error: { message: err.message } });
+    }
+
     // Write the real, durable transaction row — same table the human checkout flow writes to.
     const { data: booking, error: bookingErr } = await supabase
       .from('bookings')
@@ -49,6 +56,9 @@ export default async function handler(req, res) {
         guests: session.guests,
         nights: session.nights,
         unit_price: session.unit_price,
+        subtotal: session.subtotal,
+        promo_code: session.promo_code,
+        discount_amount: session.discount_amount,
         amount: session.amount,
       }])
       .select()
