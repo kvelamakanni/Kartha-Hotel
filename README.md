@@ -57,7 +57,7 @@ git push -u origin main
 ## 4. Test it
 
 1. Open your new `.vercel.app` URL.
-2. Pick a collection (Aurel, Devarapalli, Solaris, Crest, Terra) → **View
+2. Pick a collection (Aurel, Meridian, Solaris, Crest, Terra) → **View
    rooms** on a hotel → **Select** a room → fill in name/email → **Confirm
    booking**.
 3. In Supabase, go to **Table Editor** → `bookings` — the row should appear
@@ -71,7 +71,7 @@ git push -u origin main
 
 `lib/hotels.js` holds the hotel + room-type catalog that both the human UI
 (`index.html`) and the agent-facing endpoints below read from: 10 hotels
-across 5 collections (Aurel Collection, Devarapalli Hotels, Solaris Resorts,
+across 5 collections (Aurel Collection, Meridian Hotels, Solaris Resorts,
 Crest Urban Hotels, Terra Retreat Hotels), each with 2-3 room types
 (id, name, description, price_per_night, max_guests, beds, size_sqft).
 This shape matches the Universal Commerce Protocol shopping schema used by

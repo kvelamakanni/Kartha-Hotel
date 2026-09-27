@@ -88,9 +88,8 @@ function truncate(text, max) {
 }
 
 // Returns null if `guests` is set and no room at this hotel can fit that
-// many people — matching devara-hotel-site's search_hotels behavior, which
-// drops hotels with no qualifying room and computes "from" price only over
-// rooms that actually fit the party.
+// many people — drops hotels with no qualifying room and computes "from"
+// price only over rooms that actually fit the party.
 function toSearchSummary(hotel, guests) {
   const qualifying = guests
     ? hotel.room_types.filter((r) => r.max_guests >= guests)
