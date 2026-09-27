@@ -68,6 +68,66 @@ git push -u origin main
 
 Any `git push` to `main` auto-redeploys on Vercel — no manual redeploy step.
 
+## 5. Agent-facing endpoints (UCP + MCP)
+
+This project also exposes the booking flow in two AI-agent-readable forms,
+built to the shape of Google's open **Universal Commerce Protocol (UCP)**
+and **MCP (Model Context Protocol)** — so agents can discover Kartha
+Hotels and complete a booking without touching the human UI.
+
+**Run the extra table first:** in Supabase SQL Editor, run
+`supabase_schema_ucp.sql` (after `supabase_schema.sql`) to create the
+`checkout_sessions` table these endpoints use.
+
+### UCP discovery + checkout sessions
+- `GET /.well-known/ucp` — discovery profile: tells an agent where the
+  checkout-sessions endpoint and MCP endpoint live.
+- `POST /api/ucp/checkout-sessions` — create a session
+  ```json
+  { "hotel": "Aravalli House", "check_in": "2026-11-01", "check_out": "2026-11-04", "guests": 2 }
+  ```
+- `GET /api/ucp/checkout-sessions/:id` — read a session
+- `PATCH /api/ucp/checkout-sessions/:id` — attach the buyer
+  ```json
+  { "buyer": { "name": "Jane Doe", "email": "jane@example.com" } }
+  ```
+- `POST /api/ucp/checkout-sessions/:id/complete` — finalize → writes a real row into `bookings`
+- `POST /api/ucp/checkout-sessions/:id/cancel` — cancel
+
+Session states: `incomplete → ready_for_complete → completed | cancelled`.
+
+Quick end-to-end test with curl:
+```bash
+SITE="https://your-site.vercel.app"
+
+SESSION=$(curl -s -X POST "$SITE/api/ucp/checkout-sessions" \
+  -H "Content-Type: application/json" \
+  -d '{"hotel":"Aravalli House","check_in":"2026-11-01","check_out":"2026-11-04","guests":2}')
+ID=$(echo $SESSION | grep -o '"id":"[^"]*' | head -1 | cut -d'"' -f4)
+
+curl -s -X PATCH "$SITE/api/ucp/checkout-sessions/$ID" \
+  -H "Content-Type: application/json" \
+  -d '{"buyer":{"name":"Jane Doe","email":"jane@example.com"}}'
+
+curl -s -X POST "$SITE/api/ucp/checkout-sessions/$ID/complete"
+```
+
+### MCP endpoint
+- `POST /api/mcp` — JSON-RPC 2.0. Supports `initialize`, `tools/list`, and
+  `tools/call` for these tools: `search_hotels`, `create_checkout_session`,
+  `submit_buyer_info`, `complete_checkout_session`, `get_checkout_session`.
+
+Quick test:
+```bash
+curl -s -X POST "$SITE/api/mcp" \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+```
+
+To connect this as a real MCP server from an MCP-compatible client (like
+Claude Desktop's custom connector setup, or any MCP client that supports an
+HTTP/JSON-RPC transport), point it at `https://your-site.vercel.app/api/mcp`.
+
 ## Notes
 
 - The free tiers here (Vercel Hobby + Supabase Free) are enough for a demo

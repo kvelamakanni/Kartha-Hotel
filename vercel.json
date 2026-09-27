@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/.well-known/ucp", "destination": "/api/ucp-discovery" }
+  ]
+}
