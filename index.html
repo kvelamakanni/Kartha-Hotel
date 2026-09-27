@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kartha Hotels — Heritage Stays, Reimagined</title>
-<meta name="description" content="Kartha Hotels: heritage-inspired luxury stays across India and beyond. Book direct, no middlemen.">
+<title>Kartha Hotels — Global Stays, Booked Direct</title>
+<meta name="description" content="Kartha Hotels: iconic collections and hidden gems across the globe. Book direct, no middlemen.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -82,10 +82,10 @@
   .hero h1{
     font-size:clamp(2.2rem, 4.6vw, 3.6rem);
     line-height:1.08;
-    max-width:14ch;
+    max-width:16ch;
   }
   .hero p.lede{
-    margin-top:20px; max-width:42ch; opacity:0.82; font-size:1.05rem;
+    margin-top:20px; max-width:44ch; opacity:0.82; font-size:1.05rem;
   }
 
   /* the "arrival card" — boarding-pass style ticket motif */
@@ -113,7 +113,7 @@
     display:flex; justify-content:space-between; align-items:flex-end;
     padding-bottom:18px; border-bottom:1px dashed rgba(18,33,31,0.2); margin-bottom:14px;
   }
-  .arrival-main .city{ font-family:'Fraunces', serif; font-size:1.6rem; }
+  .arrival-main .city{ font-family:'Fraunces', serif; font-size:1.5rem; }
   .arrival-main .arrow{ opacity:0.4; font-size:1.2rem; padding:0 4px;}
   .arrival-meta{ display:flex; gap:22px; padding-bottom:20px; }
   .arrival-meta div{ font-size:0.9rem; }
@@ -169,36 +169,59 @@
   }
   .brand-strip button.active{ opacity:1; border-bottom-color:var(--brass); font-weight:600; }
 
+  .result-count{ font-size:0.85rem; opacity:0.55; margin-top:18px; }
+
   .hotel-grid{
-    display:grid; grid-template-columns:repeat(3, 1fr); gap:28px; margin-top:36px;
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:28px; margin-top:20px;
   }
   .hotel-card{
     background:#fff; border:1px solid rgba(18,33,31,0.08);
   }
   .hotel-photo{
-    height:170px; background:linear-gradient(135deg, var(--teal), #1c4a45);
-    position:relative; display:flex; align-items:flex-end; padding:14px;
+    height:150px; background:linear-gradient(135deg, var(--teal), #1c4a45);
+    position:relative; display:flex; align-items:flex-start; justify-content:space-between; padding:14px;
   }
   .hotel-photo .tag{
     background:rgba(246,241,228,0.92); color:var(--teal); font-size:0.7rem;
     padding:4px 10px; border-radius:999px; text-transform:uppercase; letter-spacing:0.03em;
   }
+  .hotel-photo .stars{ color:var(--brass); font-size:0.8rem; background:rgba(15,42,46,0.55); padding:3px 8px; border-radius:999px;}
   .hotel-body{ padding:18px 18px 20px; }
   .hotel-body .loc{ font-size:0.78rem; opacity:0.55; margin-bottom:4px; }
-  .hotel-body h3{ font-size:1.15rem; margin-bottom:8px; }
-  .hotel-body .desc{ font-size:0.88rem; opacity:0.72; margin-bottom:16px; min-height:38px;}
+  .hotel-body h3{ font-size:1.1rem; margin-bottom:8px; }
+  .hotel-body .desc{ font-size:0.85rem; opacity:0.72; margin-bottom:14px; min-height:38px;}
+  .amenity-strip{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; }
+  .amenity-strip span{
+    font-size:0.7rem; opacity:0.6; background:rgba(18,33,31,0.06); padding:3px 8px; border-radius:999px;
+  }
   .hotel-foot{ display:flex; justify-content:space-between; align-items:center; }
-  .hotel-price{ font-family:'Fraunces', serif; font-size:1.1rem; }
-  .hotel-price small{ font-family:'Work Sans'; font-size:0.75rem; opacity:0.55; font-weight:400;}
+  .hotel-price{ font-family:'Fraunces', serif; font-size:1.05rem; }
+  .hotel-price small{ font-family:'Work Sans'; font-size:0.72rem; opacity:0.55; font-weight:400;}
   .btn-select{
     background:var(--teal); color:var(--ivory); border:none; padding:9px 16px;
     font-size:0.85rem; font-weight:500; cursor:pointer; border-radius:4px;
   }
   .btn-select:hover{ background:var(--maroon); }
 
+  .room-list{ border-top:1px dashed rgba(18,33,31,0.15); margin-top:6px; padding-top:14px; display:none; }
+  .room-list.open{ display:block; }
+  .room-row{
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+    padding:10px 0; border-bottom:1px solid rgba(18,33,31,0.06);
+  }
+  .room-row:last-child{ border-bottom:none; }
+  .room-info .rname{ font-size:0.88rem; font-weight:500; }
+  .room-info .rmeta{ font-size:0.74rem; opacity:0.55; margin-top:2px; }
+  .room-price{ font-size:0.85rem; white-space:nowrap; }
+  .btn-room{
+    background:none; border:1px solid var(--teal); color:var(--teal); padding:6px 12px;
+    font-size:0.78rem; border-radius:4px; cursor:pointer; margin-left:10px;
+  }
+  .btn-room:hover{ background:var(--teal); color:var(--ivory); }
+
   /* ===== Cart drawer ===== */
   .drawer{
-    position:fixed; top:0; right:0; height:100%; width:380px; max-width:92vw;
+    position:fixed; top:0; right:0; height:100%; width:400px; max-width:92vw;
     background:var(--teal); color:var(--ivory); z-index:100;
     transform:translateX(100%); transition:transform 0.32s ease;
     display:flex; flex-direction:column; box-shadow:-30px 0 60px rgba(0,0,0,0.3);
@@ -237,6 +260,7 @@
     padding:14px; font-size:0.85rem; margin-top:14px; display:none;
   }
   .confirm-box.show{ display:block; }
+  .confirm-box .ref{ font-family:'Fraunces', serif; font-size:1.05rem; display:block; margin-bottom:4px; }
 
   /* ===== Footer ===== */
   footer{
@@ -279,16 +303,16 @@
 <section class="hero" style="padding-top:56px;">
   <div class="hero-inner">
     <div>
-      <div class="hero-eyebrow">Heritage properties, booked direct</div>
-      <h1>A room with the weight of a place's history</h1>
-      <p class="lede">Kartha runs a small collection of restored havelis, hill retreats and coastal courtyards across India — no franchise sameness, no booking-fee markup.</p>
+      <div class="hero-eyebrow">Iconic collections, hidden gems, booked direct</div>
+      <h1>A room in any city that matters to you</h1>
+      <p class="lede">Kartha curates five hotel collections — Aurel, Devarapalli, Solaris, Crest and Terra — across ten addresses on four continents, with no booking-fee markup.</p>
     </div>
     <div class="arrival-card">
       <div class="arrival-row"><span>Itinerary</span><span>KRT-0417</span></div>
       <div class="arrival-main">
-        <span class="city">Udaipur</span>
+        <span class="city">Paris</span>
         <span class="arrow">⟶</span>
-        <span class="city">Kumbalgarh</span>
+        <span class="city">Kyoto</span>
       </div>
       <div class="arrival-meta">
         <div><span>Check-in</span>Fri, Oct 09</div>
@@ -331,10 +355,11 @@
     <div class="section-head">
       <div>
         <h2>Featured properties</h2>
-        <p>Six houses, each kept by the family that has run it for generations.</p>
+        <p>Ten addresses, five collections, each vetted by our own team — no franchise sameness.</p>
       </div>
     </div>
     <div class="brand-strip" id="brandStrip"></div>
+    <div class="result-count" id="resultCount"></div>
     <div class="hotel-grid" id="hotelGrid"></div>
   </div>
 </section>
@@ -345,7 +370,8 @@
     <p style="margin-top:16px; opacity:0.75; font-size:1rem;">
       Most booking sites make every property look the same size and shape. Kartha lists fewer hotels,
       each one visited and vetted by our own team, and passes the savings from cutting out third-party
-      commissions straight into the room rate.
+      commissions straight into the room rate. Every stay here is also bookable by AI agents directly,
+      through our <a href="/.well-known/ucp" style="text-decoration:underline;">Universal Commerce Protocol</a> endpoint.
     </p>
   </div>
 </section>
@@ -385,30 +411,186 @@
 </div>
 
 <script>
+// Same catalog the Universal Commerce Protocol endpoints (/.well-known/ucp,
+// /api/mcp, /api/ucp/checkout-sessions) serve from lib/hotels.js — kept
+// inline here since this is a static page with no build step.
 const HOTELS = [
-  { id:1, brand:"Aravalli House", city:"Udaipur, Rajasthan", desc:"A 1920s lakeside haveli, seven rooms.", price:210 },
-  { id:2, brand:"Kumbal Fort Lodge", city:"Kumbalgarh, Rajasthan", desc:"Stone ramparts, wood fires, no wifi in the courtyard.", price:265 },
-  { id:3, brand:"Backwater Nilaya", city:"Alleppey, Kerala", desc:"A converted rice-boat, moored for the season.", price:180 },
-  { id:4, brand:"Nandi Hill Retreat", city:"Chikkaballapur, Karnataka", desc:"Coffee-estate bungalow, sunrise treks included.", price:145 },
-  { id:5, brand:"Kotagiri Bungalow", city:"Nilgiris, Tamil Nadu", desc:"Colonial-era tea planter's house at 6,000 ft.", price:160 },
-  { id:6, brand:"Diu Courtyard", city:"Diu", desc:"Portuguese-era courtyard house, three suites, sea view.", price:120 },
+  {
+    "id": "aurel_paris_centre", "brand": "Aurel Collection", "name": "Aurel Paris Le Marais",
+    "city": "Paris", "country": "FR", "region": "Le Marais", "star_rating": 5,
+    "amenities": ["Michelin Restaurant", "Champagne Bar", "Spa", "Concierge"],
+    "description": "Nestled in the historic Le Marais district, this 19th-century hôtel particulier blends Haussmann grandeur with contemporary French design. Steps from the Pompidou Centre.",
+    "rooms": [
+      { "id": "aurel_paris_classique", "name": "Classique Room", "description": "450 sq ft Parisian elegance with hand-painted ceilings and courtyard views.", "price": 520, "max_guests": 2, "beds": "1 King", "size_sqft": 450 },
+      { "id": "aurel_paris_prestige", "name": "Prestige Suite", "description": "800 sq ft apartment-style suite with a private salon and rooftop views of Paris.", "price": 980, "max_guests": 3, "beds": "1 King + Salon", "size_sqft": 800 }
+    ]
+  },
+  {
+    "id": "aurel_london_mayfair", "brand": "Aurel Collection", "name": "Aurel Mayfair London",
+    "city": "London", "country": "GB", "region": "Mayfair", "star_rating": 5,
+    "amenities": ["Afternoon Tea", "Whisky Bar", "Spa", "Concierge"],
+    "description": "A timeless Georgian townhouse in prestigious Mayfair, moments from Hyde Park. Impeccably restored with bespoke British craftsmanship and a world-class afternoon tea.",
+    "rooms": [
+      { "id": "aurel_london_superior", "name": "Superior Room", "description": "400 sq ft haven of British elegance with bespoke furniture and Molton Brown amenities.", "price": 460, "max_guests": 2, "beds": "1 King", "size_sqft": 400 },
+      { "id": "aurel_london_junior", "name": "Junior Suite", "description": "620 sq ft suite with a separate sitting room and views over Grosvenor Square gardens.", "price": 820, "max_guests": 3, "beds": "1 King + Sitting Room", "size_sqft": 620 }
+    ]
+  },
+  {
+    "id": "verada_nyc_midtown", "brand": "Devarapalli Hotels", "name": "Devarapalli Midtown Manhattan",
+    "city": "New York", "country": "US", "region": "Midtown", "star_rating": 5,
+    "amenities": ["Rooftop Pool", "Spa & Wellness", "Fine Dining", "Concierge"],
+    "description": "A skyscraper icon in the heart of Midtown Manhattan. Floor-to-ceiling windows reveal dramatic skyline views, while our rooftop infinity pool offers an unforgettable experience.",
+    "rooms": [
+      { "id": "verada_nyc_classic", "name": "Classic King Room", "description": "Elegant 350 sq ft sanctuary with premium bedding and city views.", "price": 389, "max_guests": 2, "beds": "1 King", "size_sqft": 350 },
+      { "id": "verada_nyc_deluxe", "name": "Deluxe Skyline Suite", "description": "Stunning 650 sq ft suite with panoramic Manhattan skyline views and a separate living area.", "price": 649, "max_guests": 3, "beds": "1 King + Sofa", "size_sqft": 650 },
+      { "id": "verada_nyc_penthouse", "name": "Penthouse Collection", "description": "Exclusive 1,200 sq ft penthouse with private terrace, butler service, and 360° city views.", "price": 1299, "max_guests": 4, "beds": "2 King", "size_sqft": 1200 }
+    ]
+  },
+  {
+    "id": "verada_miami_beach", "brand": "Devarapalli Hotels", "name": "Devarapalli South Beach",
+    "city": "Miami", "country": "US", "region": "South Beach", "star_rating": 5,
+    "amenities": ["Beach Access", "Oceanfront Pool", "Rooftop Bar", "Spa"],
+    "description": "Art Deco glamour meets modern luxury on the iconic South Beach. Steps from the white sands and turquoise waters of the Atlantic Ocean.",
+    "rooms": [
+      { "id": "verada_miami_garden", "name": "Garden View Room", "description": "Bright 380 sq ft room overlooking our lush tropical gardens.", "price": 299, "max_guests": 2, "beds": "1 King", "size_sqft": 380 },
+      { "id": "verada_miami_ocean", "name": "Oceanfront Suite", "description": "Breathtaking 700 sq ft suite with direct Atlantic Ocean views and a private balcony.", "price": 589, "max_guests": 3, "beds": "1 King + Sofa", "size_sqft": 700 }
+    ]
+  },
+  {
+    "id": "solaris_dubai_marina", "brand": "Solaris Resorts", "name": "Solaris Dubai Marina",
+    "city": "Dubai", "country": "AE", "region": "Dubai Marina", "star_rating": 5,
+    "amenities": ["Private Beach", "Sky Infinity Pool", "Multiple Restaurants", "Luxury Spa"],
+    "description": "Soaring 63 floors above the Arabian Gulf, Solaris Dubai Marina redefines ultra-luxury. Al fresco dining, a sky-high infinity pool, and private beach access await.",
+    "rooms": [
+      { "id": "solaris_dubai_premier", "name": "Premier Gulf View", "description": "550 sq ft room with floor-to-ceiling windows overlooking the glittering Arabian Gulf.", "price": 699, "max_guests": 2, "beds": "1 King", "size_sqft": 550 },
+      { "id": "solaris_dubai_sky", "name": "Sky Suite", "description": "Sprawling 1,100 sq ft sky suite with private infinity plunge pool and panoramic Dubai skyline views.", "price": 1699, "max_guests": 4, "beds": "1 King + 1 Queen", "size_sqft": 1100 }
+    ]
+  },
+  {
+    "id": "solaris_maldives", "brand": "Solaris Resorts", "name": "Solaris Maldives Overwater",
+    "city": "North Malé Atoll", "country": "MV", "region": "Maldives", "star_rating": 5,
+    "amenities": ["Overwater Bungalows", "House Reef Snorkeling", "Dive Center", "Spa Island"],
+    "description": "Exclusive overwater bungalows and beachfront villas set on a private island in the crystal-clear Indian Ocean. A once-in-a-lifetime escape.",
+    "rooms": [
+      { "id": "solaris_maldives_beach", "name": "Beach Pool Villa", "description": "Stunning 800 sq ft beach villa with private plunge pool and direct lagoon access.", "price": 1299, "max_guests": 2, "beds": "1 King", "size_sqft": 800 },
+      { "id": "solaris_maldives_water", "name": "Overwater Bungalow", "description": "Iconic 950 sq ft overwater bungalow with glass floor panels, private sundeck and direct ocean access.", "price": 1899, "max_guests": 2, "beds": "1 King", "size_sqft": 950 }
+    ]
+  },
+  {
+    "id": "crest_chicago_loop", "brand": "Crest Urban Hotels", "name": "Crest Chicago The Loop",
+    "city": "Chicago", "country": "US", "region": "The Loop", "star_rating": 4,
+    "amenities": ["Rooftop Terrace", "Farm-to-Table Restaurant", "Fitness Center", "Bike Share"],
+    "description": "A sleek urban retreat in the heart of Chicago's historic Loop. Steps from Millennium Park, the Art Institute, and the lakefront. Modern American design with a bold Chicago soul.",
+    "rooms": [
+      { "id": "crest_chicago_urban", "name": "Urban Queen Room", "description": "320 sq ft chic room with city views and locally sourced decor accents.", "price": 229, "max_guests": 2, "beds": "1 Queen", "size_sqft": 320 },
+      { "id": "crest_chicago_lakeview", "name": "Lake View Suite", "description": "600 sq ft suite with sweeping Lake Michigan views and a full sitting area.", "price": 419, "max_guests": 3, "beds": "1 King + Sofa", "size_sqft": 600 }
+    ]
+  },
+  {
+    "id": "crest_la_westside", "brand": "Crest Urban Hotels", "name": "Crest Los Angeles West Hollywood",
+    "city": "Los Angeles", "country": "US", "region": "West Hollywood", "star_rating": 4,
+    "amenities": ["Resort Pool", "Celeb Chef Restaurant", "Rooftop Bar", "Spin Classes"],
+    "description": "The ultimate LA scene hotel in the heart of West Hollywood. A glamorous mix of entertainment industry regulars, pool parties, and sunset cocktails on the Strip.",
+    "rooms": [
+      { "id": "crest_la_bungalow", "name": "Poolside Bungalow", "description": "350 sq ft private bungalow with direct pool access and outdoor patio.", "price": 359, "max_guests": 2, "beds": "1 King", "size_sqft": 350 },
+      { "id": "crest_la_penthouse", "name": "Rooftop Penthouse", "description": "900 sq ft rooftop retreat with private hot tub and 180° views of the Hollywood Hills.", "price": 899, "max_guests": 4, "beds": "2 Queen", "size_sqft": 900 }
+    ]
+  },
+  {
+    "id": "terra_bali_ubud", "brand": "Terra Retreat Hotels", "name": "Terra Bali Ubud Jungle",
+    "city": "Ubud", "country": "ID", "region": "Central Bali", "star_rating": 5,
+    "amenities": ["Jungle Infinity Pool", "Balinese Spa", "Daily Yoga", "Cooking Classes"],
+    "description": "Perched above the Ayung River gorge in the cultural heart of Bali. Infinity pools merge with the jungle canopy, while morning yoga and traditional Balinese healing complete your escape.",
+    "rooms": [
+      { "id": "terra_bali_villa", "name": "Jungle Pool Villa", "description": "900 sq ft open-plan villa with private plunge pool and breathtaking jungle gorge views.", "price": 599, "max_guests": 2, "beds": "1 King", "size_sqft": 900 },
+      { "id": "terra_bali_family", "name": "Family River Suite", "description": "1,200 sq ft two-bedroom suite ideal for families, with river-facing deck and children's pool.", "price": 1099, "max_guests": 5, "beds": "1 King + 2 Twin", "size_sqft": 1200 }
+    ]
+  },
+  {
+    "id": "terra_kyoto_higashiyama", "brand": "Terra Retreat Hotels", "name": "Terra Kyoto Higashiyama",
+    "city": "Kyoto", "country": "JP", "region": "Higashiyama", "star_rating": 5,
+    "amenities": ["Kaiseki Restaurant", "Japanese Garden", "Tea Ceremony", "Onsen Bath"],
+    "description": "A lovingly restored Meiji-era machiya townhouse in Kyoto's most traditional neighborhood. Tatami-floored rooms, an omakase kaiseki restaurant, and a private bamboo garden.",
+    "rooms": [
+      { "id": "terra_kyoto_tatami", "name": "Tatami Garden Room", "description": "280 sq ft authentic tatami room with shoji screens and garden views — a retreat for the soul.", "price": 440, "max_guests": 2, "beds": "Japanese Futon", "size_sqft": 280 },
+      { "id": "terra_kyoto_suite", "name": "Machiya Suite", "description": "550 sq ft two-room suite spanning two floors of the historic townhouse with private rotenburo (outdoor bath).", "price": 890, "max_guests": 3, "beds": "1 King + Futon", "size_sqft": 550 }
+    ]
+  }
 ];
 
+const BRANDS = [...new Set(HOTELS.map(h => h.brand))];
+
+let activeBrand = 'All';
+let query = '';
+
+const brandStrip = document.getElementById('brandStrip');
+brandStrip.innerHTML = ['All', ...BRANDS].map(b =>
+  `<button data-brand="${b}" class="${b === 'All' ? 'active' : ''}">${b}</button>`
+).join('');
+
+brandStrip.addEventListener('click', (e) => {
+  const btn = e.target.closest('button');
+  if(!btn) return;
+  activeBrand = btn.dataset.brand;
+  [...brandStrip.children].forEach(b => b.classList.toggle('active', b === btn));
+  renderGrid();
+});
+
+function matchesQuery(hotel, q){
+  if(!q) return true;
+  const hay = [hotel.city, hotel.country, hotel.region, hotel.brand, hotel.name].join(' ').toLowerCase();
+  return hay.includes(q.toLowerCase());
+}
+
+function cheapestPrice(hotel){
+  return Math.min(...hotel.rooms.map(r => r.price));
+}
+
 const grid = document.getElementById('hotelGrid');
-grid.innerHTML = HOTELS.map(h => `
-  <div class="hotel-card">
-    <div class="hotel-photo"><span class="tag">${h.brand}</span></div>
-    <div class="hotel-body">
-      <div class="loc">${h.city}</div>
-      <h3>${h.brand}</h3>
-      <div class="desc">${h.desc}</div>
-      <div class="hotel-foot">
-        <div class="hotel-price">$${h.price}<small> / night</small></div>
-        <button class="btn-select" data-id="${h.id}">Select</button>
+const resultCount = document.getElementById('resultCount');
+
+function renderGrid(){
+  const filtered = HOTELS.filter(h =>
+    (activeBrand === 'All' || h.brand === activeBrand) && matchesQuery(h, query)
+  );
+
+  resultCount.textContent = `${filtered.length} ${filtered.length === 1 ? 'stay' : 'stays'} found`;
+
+  grid.innerHTML = filtered.map(h => `
+    <div class="hotel-card" data-hotel="${h.id}">
+      <div class="hotel-photo">
+        <span class="tag">${h.brand}</span>
+        <span class="stars">${'★'.repeat(h.star_rating)}</span>
+      </div>
+      <div class="hotel-body">
+        <div class="loc">${h.city}, ${h.country} · ${h.region}</div>
+        <h3>${h.name}</h3>
+        <div class="desc">${h.description}</div>
+        <div class="amenity-strip">${h.amenities.map(a => `<span>${a}</span>`).join('')}</div>
+        <div class="hotel-foot">
+          <div class="hotel-price">$${cheapestPrice(h)}<small> / night from</small></div>
+          <button class="btn-select" data-toggle="${h.id}">View rooms</button>
+        </div>
+        <div class="room-list" id="rooms-${h.id}">
+          ${h.rooms.map(r => `
+            <div class="room-row">
+              <div class="room-info">
+                <div class="rname">${r.name}</div>
+                <div class="rmeta">${r.beds} · ${r.size_sqft} sq ft · sleeps ${r.max_guests}</div>
+              </div>
+              <div style="display:flex; align-items:center;">
+                <span class="room-price">$${r.price}/night</span>
+                <button class="btn-room" data-hotel="${h.id}" data-room="${r.id}">Select</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
       </div>
     </div>
-  </div>
-`).join('');
+  `).join('');
+}
+
+renderGrid();
 
 let cart = null; // single room at a time for simplicity
 
@@ -429,16 +611,26 @@ document.getElementById('drawerClose').onclick = closeDrawer;
 scrim.onclick = closeDrawer;
 
 grid.addEventListener('click', (e) => {
-  const btn = e.target.closest('.btn-select');
-  if(!btn) return;
-  const hotel = HOTELS.find(h => h.id == btn.dataset.id);
-  const nights = 3;
-  cart = { ...hotel, nights, amount: hotel.price * nights };
-  renderCart();
-  openDrawer();
+  const toggleBtn = e.target.closest('[data-toggle]');
+  if(toggleBtn){
+    document.getElementById(`rooms-${toggleBtn.dataset.toggle}`).classList.toggle('open');
+    return;
+  }
+
+  const roomBtn = e.target.closest('.btn-room');
+  if(roomBtn){
+    const hotel = HOTELS.find(h => h.id === roomBtn.dataset.hotel);
+    const room = hotel.rooms.find(r => r.id === roomBtn.dataset.room);
+    const nights = 3;
+    cart = { hotel, room, nights, amount: room.price * nights };
+    renderCart();
+    openDrawer();
+  }
 });
 
 function renderCart(){
+  confirmBox.classList.remove('show');
+  confirmBox.style.borderColor = '';
   if(!cart){
     drawerItems.innerHTML = '<div class="empty-cart">No room selected yet. Browse stays to begin.</div>';
     checkoutForm.style.display = 'none';
@@ -450,8 +642,8 @@ function renderCart(){
   }
   drawerItems.innerHTML = `
     <div class="drawer-item">
-      <div class="row"><strong>${cart.brand}</strong><span>$${cart.amount}</span></div>
-      <div class="muted">${cart.city} · ${cart.nights} nights</div>
+      <div class="row"><strong>${cart.hotel.name}</strong><span>$${cart.amount}</span></div>
+      <div class="muted">${cart.room.name} · ${cart.hotel.city} · ${cart.nights} nights</div>
     </div>
   `;
   checkoutForm.style.display = 'flex';
@@ -484,17 +676,17 @@ checkoutBtn.addEventListener('click', async () => {
       body: JSON.stringify({
         guestName: name,
         email: email,
-        hotelName: cart.brand,
+        hotelId: cart.hotel.id,
+        roomId: cart.room.id,
         checkIn, checkOut,
-        guests: 2,
-        amount: cart.amount
+        guests: cart.room.max_guests
       })
     });
     const data = await res.json();
     if(!res.ok) throw new Error(data.error || 'Booking failed');
 
     confirmBox.classList.add('show');
-    confirmBox.textContent = `Booked. Confirmation ref ${data.booking?.id ?? ''}. A copy was sent to ${email}.`;
+    confirmBox.innerHTML = `<span class="ref">${data.booking?.booking_ref ?? ''}</span>Booked. A confirmation was sent to ${email}.`;
     checkoutBtn.textContent = 'Booking confirmed';
   } catch(err){
     confirmBox.classList.add('show');
@@ -507,6 +699,8 @@ checkoutBtn.addEventListener('click', async () => {
 
 document.getElementById('searchForm').addEventListener('submit', (e) => {
   e.preventDefault();
+  query = document.getElementById('destination').value;
+  renderGrid();
   document.getElementById('stays').scrollIntoView({behavior:'smooth'});
 });
 </script>

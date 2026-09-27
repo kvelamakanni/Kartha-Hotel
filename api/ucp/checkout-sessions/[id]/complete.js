@@ -1,5 +1,5 @@
 import { supabase } from '../../../../lib/supabaseClient.js';
-import { toUcpSession } from '../../../../lib/sessions.js';
+import { toUcpSession, generateBookingRef } from '../../../../lib/sessions.js';
 
 function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -36,12 +36,19 @@ export default async function handler(req, res) {
     const { data: booking, error: bookingErr } = await supabase
       .from('bookings')
       .insert([{
+        booking_ref: generateBookingRef(),
         guest_name: session.guest_name,
         email: session.email,
+        hotel_id: session.hotel_id,
         hotel_name: session.hotel_name,
+        brand: session.brand,
+        room_id: session.room_id,
+        room_name: session.room_name,
         check_in: session.check_in,
         check_out: session.check_out,
         guests: session.guests,
+        nights: session.nights,
+        unit_price: session.unit_price,
         amount: session.amount,
       }])
       .select()
@@ -62,7 +69,11 @@ export default async function handler(req, res) {
 
     if (updateErr) throw updateErr;
 
-    return res.status(200).json({ ...toUcpSession(updated), booking_id: booking.id });
+    return res.status(200).json({
+      ...toUcpSession(updated),
+      booking_id: booking.id,
+      booking_ref: booking.booking_ref,
+    });
   } catch (err) {
     console.error('UCP complete session failed:', err);
     return res.status(500).json({ error: { message: err.message || 'Failed to complete session' } });

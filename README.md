@@ -57,12 +57,26 @@ git push -u origin main
 ## 4. Test it
 
 1. Open your new `.vercel.app` URL.
-2. Select a room → fill in name/email → **Confirm booking**.
+2. Pick a collection (Aurel, Devarapalli, Solaris, Crest, Terra) → **View
+   rooms** on a hotel → **Select** a room → fill in name/email → **Confirm
+   booking**.
 3. In Supabase, go to **Table Editor** → `bookings` — the row should appear
-   immediately. That's your transaction log.
+   immediately, with a `booking_ref` like `BK-7F3K9A`. That's your
+   transaction log.
 4. You can also hit `https://your-site.vercel.app/api/bookings` directly in
    a browser to see the last 50 bookings as JSON (useful for a future admin
    page).
+
+## The catalog
+
+`lib/hotels.js` holds the hotel + room-type catalog that both the human UI
+(`index.html`) and the agent-facing endpoints below read from: 10 hotels
+across 5 collections (Aurel Collection, Devarapalli Hotels, Solaris Resorts,
+Crest Urban Hotels, Terra Retreat Hotels), each with 2-3 room types
+(id, name, description, price_per_night, max_guests, beds, size_sqft).
+This shape matches the Universal Commerce Protocol shopping schema used by
+other UCP-compliant hotel sites, so search/details responses are drop-in
+compatible for an agent that already knows how to talk to one.
 
 ## Making changes later
 
@@ -82,16 +96,16 @@ Hotels and complete a booking without touching the human UI.
 ### UCP discovery + checkout sessions
 - `GET /.well-known/ucp` — discovery profile: tells an agent where the
   checkout-sessions endpoint and MCP endpoint live.
-- `POST /api/ucp/checkout-sessions` — create a session
+- `POST /api/ucp/checkout-sessions` — create a session for a specific hotel + room
   ```json
-  { "hotel": "Aravalli House", "check_in": "2026-11-01", "check_out": "2026-11-04", "guests": 2 }
+  { "hotel_id": "aurel_paris_centre", "room_id": "aurel_paris_classique", "check_in": "2026-11-01", "check_out": "2026-11-04", "guests": 2 }
   ```
 - `GET /api/ucp/checkout-sessions/:id` — read a session
 - `PATCH /api/ucp/checkout-sessions/:id` — attach the buyer
   ```json
   { "buyer": { "name": "Jane Doe", "email": "jane@example.com" } }
   ```
-- `POST /api/ucp/checkout-sessions/:id/complete` — finalize → writes a real row into `bookings`
+- `POST /api/ucp/checkout-sessions/:id/complete` — finalize → writes a real row into `bookings`, with a `booking_ref` like `BK-7F3K9A`
 - `POST /api/ucp/checkout-sessions/:id/cancel` — cancel
 
 Session states: `incomplete → ready_for_complete → completed | cancelled`.
@@ -102,7 +116,7 @@ SITE="https://your-site.vercel.app"
 
 SESSION=$(curl -s -X POST "$SITE/api/ucp/checkout-sessions" \
   -H "Content-Type: application/json" \
-  -d '{"hotel":"Aravalli House","check_in":"2026-11-01","check_out":"2026-11-04","guests":2}')
+  -d '{"hotel_id":"aurel_paris_centre","room_id":"aurel_paris_classique","check_in":"2026-11-01","check_out":"2026-11-04","guests":2}')
 ID=$(echo $SESSION | grep -o '"id":"[^"]*' | head -1 | cut -d'"' -f4)
 
 curl -s -X PATCH "$SITE/api/ucp/checkout-sessions/$ID" \
@@ -114,8 +128,16 @@ curl -s -X POST "$SITE/api/ucp/checkout-sessions/$ID/complete"
 
 ### MCP endpoint
 - `POST /api/mcp` — JSON-RPC 2.0. Supports `initialize`, `tools/list`, and
-  `tools/call` for these tools: `search_hotels`, `create_checkout_session`,
-  `submit_buyer_info`, `complete_checkout_session`, `get_checkout_session`.
+  `tools/call` for these tools: `search_hotels`, `get_hotel_details`,
+  `create_booking_session`, `submit_buyer_info` (this server's own addition —
+  see note below), `complete_booking`, `cancel_booking`.
+
+> **Note:** the reference UCP hotel site this was matched against resolves
+> buyer identity via OAuth2 identity-linking (see its `auth` block in
+> `/.well-known/ucp`), so its `complete_booking` needs no separate buyer step.
+> This project doesn't implement OAuth yet, so `submit_buyer_info` (name +
+> email) is a required extra step between `create_booking_session` and
+> `complete_booking`.
 
 Quick test:
 ```bash

@@ -1,5 +1,5 @@
 import { supabase } from '../../../lib/supabaseClient.js';
-import { findHotel, nightsBetween } from '../../../lib/hotels.js';
+import { findHotel, findRoom, nightsBetween } from '../../../lib/hotels.js';
 import { toUcpSession } from '../../../lib/sessions.js';
 
 function cors(res) {
@@ -16,29 +16,40 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { hotel, check_in, check_out, guests } = req.body || {};
-    const listing = findHotel(hotel);
+    const { hotel_id, room_id, check_in, check_out, guests } = req.body || {};
+    const hotel = findHotel(hotel_id);
 
-    if (!listing || !check_in || !check_out) {
+    if (!hotel) {
+      return res.status(400).json({ error: { message: `No hotel matching hotel_id "${hotel_id}"` } });
+    }
+    const room = findRoom(hotel, room_id);
+    if (!room) {
+      return res.status(400).json({ error: { message: `No room matching room_id "${room_id}" at this hotel` } });
+    }
+    if (!check_in || !check_out) {
       return res.status(400).json({
-        error: { message: 'hotel, check_in and check_out are required' },
+        error: { message: 'check_in and check_out are required' },
       });
     }
 
     const nights = nightsBetween(check_in, check_out);
     const guestCount = guests || 1;
-    const amount = listing.price * nights;
+    const amount = room.price_per_night * nights;
 
     const { data, error } = await supabase
       .from('checkout_sessions')
       .insert([{
         status: 'incomplete', // buyer info not collected yet
-        hotel_name: listing.brand,
+        hotel_id: hotel.id,
+        hotel_name: hotel.name,
+        brand: hotel.brand,
+        room_id: room.id,
+        room_name: room.name,
         check_in,
         check_out,
         guests: guestCount,
         nights,
-        unit_price: listing.price,
+        unit_price: room.price_per_night,
         amount,
       }])
       .select()

@@ -1,33 +1,49 @@
 import { supabase } from '../lib/supabaseClient.js';
-import { HOTELS, findHotel, nightsBetween } from '../lib/hotels.js';
-import { toUcpSession } from '../lib/sessions.js';
+import { findHotel, findRoom, searchHotels, nightsBetween } from '../lib/hotels.js';
+import { toUcpSession, generateBookingRef } from '../lib/sessions.js';
 
 const TOOLS = [
   {
     name: 'search_hotels',
-    description: 'List Kartha Hotels properties, optionally filtered by city or region text match.',
-    inputSchema: {
-      type: 'object',
-      properties: { query: { type: 'string', description: 'Free-text city/region filter, e.g. "Rajasthan"' } },
-    },
-  },
-  {
-    name: 'create_checkout_session',
-    description: 'Start a booking for a specific hotel and date range. Returns a session id used by the other tools.',
+    description: 'Search for available hotels by destination, dates and guest count. If the user does not provide the check-in date, check-out date, or number of guests in their request, DO NOT invent or assume values. You MUST ask the user for these details first before calling this tool.',
     inputSchema: {
       type: 'object',
       properties: {
-        hotel: { type: 'string', description: 'Hotel name or id from search_hotels' },
-        check_in: { type: 'string', description: 'YYYY-MM-DD' },
-        check_out: { type: 'string', description: 'YYYY-MM-DD' },
-        guests: { type: 'integer' },
+        destination: { type: 'string', description: "City, country, or region to search (e.g. 'Paris', 'US', 'Maldives')" },
+        check_in: { type: 'string', description: 'Check-in date in YYYY-MM-DD format. Do not guess this value, ask the user if not provided.' },
+        check_out: { type: 'string', description: 'Check-out date in YYYY-MM-DD format. Do not guess this value, ask the user if not provided.' },
+        guests: { type: 'integer', description: 'Number of guests. Do not guess this value, ask the user if not provided.' },
       },
-      required: ['hotel', 'check_in', 'check_out'],
+      required: ['destination', 'check_in', 'check_out', 'guests'],
+    },
+  },
+  {
+    name: 'get_hotel_details',
+    description: 'Get full details for a specific hotel, including room types, amenities, and pricing.',
+    inputSchema: {
+      type: 'object',
+      properties: { hotel_id: { type: 'string', description: 'The hotel ID from search results' } },
+      required: ['hotel_id'],
+    },
+  },
+  {
+    name: 'create_booking_session',
+    description: 'Create a booking session for a hotel room. Returns a UCP-compliant checkout session with pricing and payment options.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        hotel_id: { type: 'string', description: 'Hotel ID' },
+        room_id: { type: 'string', description: 'Room type ID to book' },
+        check_in: { type: 'string', description: 'Check-in date YYYY-MM-DD' },
+        check_out: { type: 'string', description: 'Check-out date YYYY-MM-DD' },
+        guests: { type: 'integer', description: 'Number of guests' },
+      },
+      required: ['hotel_id', 'room_id', 'check_in', 'check_out'],
     },
   },
   {
     name: 'submit_buyer_info',
-    description: 'Attach guest name and email to a checkout session, moving it to ready_for_complete.',
+    description: 'Attach guest name and email to a checkout session, moving it to ready_for_complete. Required before complete_booking, since this server does not (yet) resolve buyer identity via OAuth.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -39,51 +55,84 @@ const TOOLS = [
     },
   },
   {
-    name: 'complete_checkout_session',
-    description: 'Finalize a ready_for_complete session into a real, logged booking.',
+    name: 'complete_booking',
+    description: 'Complete a hotel booking session and generate a booking confirmation.',
     inputSchema: {
       type: 'object',
-      properties: { session_id: { type: 'string' } },
+      properties: { session_id: { type: 'string', description: 'The checkout session ID to complete' } },
       required: ['session_id'],
     },
   },
   {
-    name: 'get_checkout_session',
-    description: 'Read back the current state of a checkout session.',
+    name: 'cancel_booking',
+    description: 'Cancel a hotel booking or reservation. You must provide either the session_id or the booking reference.',
     inputSchema: {
       type: 'object',
-      properties: { session_id: { type: 'string' } },
-      required: ['session_id'],
+      properties: {
+        session_id: { type: 'string', description: 'The checkout session ID to cancel' },
+        booking_ref: { type: 'string', description: 'The confirmation reference (e.g. BK-XXXXXX) to cancel' },
+      },
     },
   },
 ];
 
+function truncate(text, max) {
+  if (!text || text.length <= max) return text;
+  return text.slice(0, max).trimEnd() + '...';
+}
+
+function toSearchSummary(hotel) {
+  const cheapest = hotel.room_types.reduce((min, r) => Math.min(min, r.price_per_night), Infinity);
+  return {
+    id: hotel.id,
+    brand: hotel.brand,
+    name: hotel.name,
+    location: hotel.location,
+    star_rating: hotel.star_rating,
+    amenities: hotel.amenities,
+    from_price_per_night: cheapest,
+    currency: 'USD',
+    image: hotel.images[0],
+    description: truncate(hotel.description, 140),
+  };
+}
+
 async function callTool(name, args) {
   switch (name) {
     case 'search_hotels': {
-      const q = (args?.query || '').toLowerCase();
-      const results = q
-        ? HOTELS.filter((h) => h.city.toLowerCase().includes(q) || h.brand.toLowerCase().includes(q))
-        : HOTELS;
-      return results;
+      const results = searchHotels(args?.destination).map(toSearchSummary);
+      return { hotels: results, count: results.length };
     }
 
-    case 'create_checkout_session': {
-      const listing = findHotel(args.hotel);
-      if (!listing) throw new Error(`No hotel matching "${args.hotel}"`);
+    case 'get_hotel_details': {
+      const hotel = findHotel(args?.hotel_id);
+      if (!hotel) throw new Error(`No hotel matching "${args?.hotel_id}"`);
+      return hotel;
+    }
+
+    case 'create_booking_session': {
+      const hotel = findHotel(args?.hotel_id);
+      if (!hotel) throw new Error(`No hotel matching "${args?.hotel_id}"`);
+      const room = findRoom(hotel, args?.room_id);
+      if (!room) throw new Error(`No room matching "${args?.room_id}" at ${hotel.name}`);
+
       const nights = nightsBetween(args.check_in, args.check_out);
-      const amount = listing.price * nights;
+      const amount = room.price_per_night * nights;
 
       const { data, error } = await supabase
         .from('checkout_sessions')
         .insert([{
           status: 'incomplete',
-          hotel_name: listing.brand,
+          hotel_id: hotel.id,
+          hotel_name: hotel.name,
+          brand: hotel.brand,
+          room_id: room.id,
+          room_name: room.name,
           check_in: args.check_in,
           check_out: args.check_out,
           guests: args.guests || 1,
           nights,
-          unit_price: listing.price,
+          unit_price: room.price_per_night,
           amount,
         }])
         .select()
@@ -117,7 +166,7 @@ async function callTool(name, args) {
       return toUcpSession(data);
     }
 
-    case 'complete_checkout_session': {
+    case 'complete_booking': {
       const { data: session, error: fetchErr } = await supabase
         .from('checkout_sessions')
         .select('*')
@@ -125,18 +174,25 @@ async function callTool(name, args) {
         .single();
       if (fetchErr || !session) throw new Error('Session not found');
       if (session.status !== 'ready_for_complete') {
-        throw new Error(`Session must be ready_for_complete (currently ${session.status})`);
+        throw new Error(`Session must be ready_for_complete (currently ${session.status}). Call submit_buyer_info first.`);
       }
 
       const { data: booking, error: bookingErr } = await supabase
         .from('bookings')
         .insert([{
+          booking_ref: generateBookingRef(),
           guest_name: session.guest_name,
           email: session.email,
+          hotel_id: session.hotel_id,
           hotel_name: session.hotel_name,
+          brand: session.brand,
+          room_id: session.room_id,
+          room_name: session.room_name,
           check_in: session.check_in,
           check_out: session.check_out,
           guests: session.guests,
+          nights: session.nights,
+          unit_price: session.unit_price,
           amount: session.amount,
         }])
         .select()
@@ -151,16 +207,55 @@ async function callTool(name, args) {
         .single();
       if (updateErr) throw new Error(updateErr.message);
 
-      return { ...toUcpSession(updated), booking_id: booking.id };
+      return { ...toUcpSession(updated), booking_id: booking.id, booking_ref: booking.booking_ref };
     }
 
-    case 'get_checkout_session': {
-      const { data, error } = await supabase
+    case 'cancel_booking': {
+      if (!args?.session_id && !args?.booking_ref) {
+        throw new Error('Provide either session_id or booking_ref');
+      }
+
+      if (args.booking_ref) {
+        const { data: booking, error: fetchErr } = await supabase
+          .from('bookings')
+          .select('*')
+          .eq('booking_ref', args.booking_ref)
+          .single();
+        if (fetchErr || !booking) throw new Error('Booking not found');
+        if (booking.status === 'cancelled') throw new Error('Booking already cancelled');
+
+        const { data: updated, error } = await supabase
+          .from('bookings')
+          .update({ status: 'cancelled' })
+          .eq('id', booking.id)
+          .select()
+          .single();
+        if (error) throw new Error(error.message);
+
+        await supabase
+          .from('checkout_sessions')
+          .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+          .eq('booking_id', booking.id);
+
+        return updated;
+      }
+
+      const { data: session, error: fetchErr } = await supabase
         .from('checkout_sessions')
         .select('*')
         .eq('id', args.session_id)
         .single();
-      if (error || !data) throw new Error('Session not found');
+      if (fetchErr || !session) throw new Error('Session not found');
+      if (session.status === 'completed') {
+        throw new Error('Session already completed — cancel the booking by its booking_ref instead');
+      }
+      const { data, error } = await supabase
+        .from('checkout_sessions')
+        .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+        .eq('id', args.session_id)
+        .select()
+        .single();
+      if (error) throw new Error(error.message);
       return toUcpSession(data);
     }
 
